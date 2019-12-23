@@ -3,18 +3,23 @@ import numpy as np
 import skimage.measure
 
 addcolor = (0, 0, 50)
-imagesize = (480,640,3)
-blocksize = 1
-blurshape = (int(imagesize[0]/blocksize),int(imagesize[1]/blocksize),imagesize[2])
 nframes = 10
+blocksize = 10
 colorsensitivity = 50
 areaSensitivity = 10000
 
-cap = cv2.VideoCapture(0)
+#cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('https://192.168.1.126:22136/video')
+
+imagesize = cap.read()[1].shape # capture one frame to find resolution/size/shape
+blurshape = (int(imagesize[0]/blocksize),int(imagesize[1]/blocksize),imagesize[2])
+
 H = np.array(np.zeros(shape=((1,)+blurshape)), dtype=np.uint8)
+
 
 while True:
     ret, frame = cap.read()
+#    imagesize = frame.size
     blur = skimage.measure.block_reduce(frame, block_size=(blocksize,blocksize,1), func=np.mean).astype(np.uint8)
     #we sample the image in blocks of blocksize pixels | we use the average of each block for our new pixel values
     #the reason we downsample is to reduce computation time and storage
